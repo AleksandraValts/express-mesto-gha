@@ -9,7 +9,7 @@ module.exports.getUser = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400)
@@ -21,6 +21,7 @@ module.exports.createUser = (req, res) => {
 module.exports.getUserId = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
+    .orFail(new Error('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -40,8 +41,6 @@ module.exports.changeUserInfo = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         return res.status(400).send({ message: 'Невозможно обновить профиль' });
-      } if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Пользователь не найден' });
       }
       return res.status(500).send({ message: err.message });
     });
@@ -52,10 +51,8 @@ module.exports.changeAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Невозможно обновить аватар' });
-      } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        res.status(400).send({ message: 'Данные переданы некорректно' });
       } else { res.status(500).send({ message: err.message }); }
     });
 };

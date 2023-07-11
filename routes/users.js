@@ -1,4 +1,3 @@
-const express = require('express');
 const router = require('express').Router();
 
 const {
@@ -11,7 +10,7 @@ const {
 
 router.get('/', getUser);
 router.get('/:userId', getUserId);
-router.post('/', express.json(), createUser);
-router.patch('/me', express.json(), changeUserInfo);
-router.patch('/me/avatar', express.json(), changeAvatar);
+router.post('/', createUser);
+router.patch('/me', changeUserInfo);
+router.patch('/me/avatar', changeAvatar);
 module.exports = router;
