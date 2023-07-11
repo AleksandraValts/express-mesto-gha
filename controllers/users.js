@@ -35,7 +35,6 @@ module.exports.getUserId = (req, res) => {
 module.exports.changeUserInfo = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
-    .orFail()
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
