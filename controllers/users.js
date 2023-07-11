@@ -24,28 +24,32 @@ module.exports.getUserId = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404)
-          .send({ message: 'Пользователь не найден' });
-      } else { res.status(500).send({ message: err.message }); }
+        return res.status(400)
+          .send({ message: 'Данные не верны' });
+      } if (err.message === 'NotFound') {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      return res.status(500).send({ message: err.message });
     });
 };
 
 module.exports.changeUserInfo = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Невозможно обновить профиль' });
-      } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Карточка не найдена' });
-      } else { res.status(500).send({ message: err.message }); }
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        return res.status(400).send({ message: 'Невозможно обновить профиль' });
+      } if (err.message === 'NotFound') {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      }
+      return res.status(500).send({ message: err.message });
     });
 };
 
 module.exports.changeAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
