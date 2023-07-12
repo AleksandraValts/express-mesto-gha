@@ -14,7 +14,7 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Невозможно создать карточку' });
+        res.status(400).send({ message: 'Данные переданы неверно' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка!' });
       }
@@ -32,7 +32,7 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Данные переданы неверно' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка!' });
       }
@@ -53,7 +53,7 @@ module.exports.putLike = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Карточка не найдена' });
+        res.status(400).send({ message: 'Данные переданы неверно' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка!' });
       }

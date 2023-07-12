@@ -12,7 +12,7 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Невозможно создать пользователя' });
+        res.status(400).send({ message: 'Данные переданы неверно' });
       } else { res.status(500).send({ message: 'Произошла ошибка!' }); }
     });
 };
@@ -24,7 +24,7 @@ module.exports.getUserId = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Данные не верны' });
+        return res.status(400).send({ message: 'Данные переданы неверно' });
       } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
@@ -38,7 +38,7 @@ module.exports.changeUserInfo = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невозможно обновить профиль' });
+        return res.status(400).send({ message: 'Данные переданы неверно' });
       }
       return res.status(500).send({ message: 'Произошла ошибка!' });
     });
@@ -50,7 +50,7 @@ module.exports.changeAvatar = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400).send({ message: 'Данные переданы некорректно' });
+        res.status(400).send({ message: 'Данные переданы неверно' });
       } else { res.status(500).send({ message: 'Произошла ошибка!' }); }
     });
 };
