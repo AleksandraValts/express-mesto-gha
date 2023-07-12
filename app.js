@@ -18,9 +18,6 @@ app.use((req, res, next) => {
 });
 
 app.use(router);
-app.get('/', (req, res) => {
-  res.send('HI');
-});
 
 app.listen(PORT, () => {
   console.log('Ссылка на сервер');

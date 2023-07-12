@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports.getUser = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(500).send({ message: 'Ошибка 500' }));
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка!' }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -13,7 +13,7 @@ module.exports.createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Невозможно создать пользователя' });
-      } else { res.status(500).send({ message: err.message }); }
+      } else { res.status(500).send({ message: 'Произошла ошибка!' }); }
     });
 };
 
@@ -28,7 +28,7 @@ module.exports.getUserId = (req, res) => {
       } if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь не найден' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(500).send({ message: 'Произошла ошибка!' });
     });
 };
 
@@ -40,7 +40,7 @@ module.exports.changeUserInfo = (req, res) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         return res.status(400).send({ message: 'Невозможно обновить профиль' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(500).send({ message: 'Произошла ошибка!' });
     });
 };
 
@@ -51,6 +51,6 @@ module.exports.changeAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(400).send({ message: 'Данные переданы некорректно' });
-      } else { res.status(500).send({ message: err.message }); }
+      } else { res.status(500).send({ message: 'Произошла ошибка!' }); }
     });
 };
