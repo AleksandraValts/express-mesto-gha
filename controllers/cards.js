@@ -45,6 +45,7 @@ module.exports.putLike = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail()
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
