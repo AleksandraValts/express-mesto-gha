@@ -40,33 +40,26 @@ module.exports.deleteCard = (req, res) => {
 };
 
 module.exports.putLike = (req, res) => {
-  Card
-    .findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true },
-    )
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
-      }
-      return res.status(200).send(card);
-    })
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Данные переданы неверно' });
+        return res.status(400).send({ message: 'Карточка не найдена' });
       }
       return res.status(500).send({ message: err.message });
     });
 };
 
 module.exports.deleteLike = (req, res) => {
-  Card
-    .findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true },
-    )
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
