@@ -29,12 +29,12 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        next(new Conflict('Пользователь уже зарегистрирован'));
-      } else if (err.name === 'ValidationError') {
-        next(new BadRequest('Данные переданы неверно'));
-      } else {
-        next(err);
+        return next(new Conflict('Пользователь уже существует'));
       }
+      if (err.name === 'ValidationError') {
+        return next(new BadRequest('Данные переданы неверно'));
+      }
+      return next(err);
     });
 };
 
