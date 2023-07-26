@@ -12,8 +12,8 @@ const User = new mongoose.Schema({
   },
   about: {
     type: String,
-    minlength: [2, 'Минимальное количество символов - 2'],
-    maxlength: [30, 'Максимальное количество символов - 30'],
+    minlength: 2,
+    maxlength: 30,
     default: 'Исследователь',
   },
   avatar: {

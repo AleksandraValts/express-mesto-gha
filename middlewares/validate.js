@@ -1,6 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const isUrl = require('validator/lib/isURL');
-const BadRequest = require('../errors/BadRequest (400)'); // 400
+const BadRequest = require('../errors/BadRequest (400)');
 
 const validationUrl = (url) => {
   const validate = isUrl(url);
@@ -27,22 +27,9 @@ module.exports.validationCreateUser = celebrate({
   }),
 });
 
-module.exports.validationUpdateUser = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).max(30).required(),
-  }),
-});
-
 module.exports.validationUpdateAvatar = celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().custom(validationUrl),
-  }),
-});
-
-module.exports.validationUserId = celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().required(),
   }),
 });
 

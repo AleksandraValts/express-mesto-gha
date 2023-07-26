@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const CODE_OK = 200;
 const CODE_SUCCESS = 201;
 const BadRequest = require('../errors/BadRequest (400)');
 const Conflict = require('../errors/Conflict (409)');
@@ -42,46 +41,51 @@ module.exports.createUser = (req, res, next) => {
 module.exports.getUserId = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
-    .orFail(new NotFound('Пользователь не найден'))
-    .then((user) => res.status(CODE_OK).send(user))
+    .then((user) => {
+      if (user) return res.send({ user });
+      throw new NotFound('Пользователь не найден');
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Данные переданы неверно');
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      if (err.message === 'NotFound') {
-        throw new NotFound('Пользователь не найден');
-      }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.changeUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   const { userId } = req.user;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .orFail(() => {
+    .then((user) => {
+      if (user) return res.send({ user });
       throw new NotFound('Пользователь не найден');
     })
-    .then((user) => res.status(CODE_OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Данные переданы неверно');
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.changeAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { userId } = req.user;
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .then((user) => res.status(CODE_OK).send(user))
+    .then((user) => {
+      if (user) return res.send({ user });
+      throw new NotFound('Пользователь не найден');
+    })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequest('Данные переданы неверно');
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.login = (req, res, next) => {
