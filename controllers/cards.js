@@ -1,18 +1,18 @@
 const Card = require('../models/card');
+const NotFound = require('../errors/NotFound (404)');
+const Forbidden = require('../errors/Forbidden (403)');
+const BadRequest = require('../errors/BadRequest (400)');
 
 const CODE_OK = 200;
 const CODE_SUCCESS = 201;
-const BAD_REQUEST = 400;
-const NOT_FOUND = 404;
-const SERVER_ERROR = 500;
 
-module.exports.getCard = (req, res) => {
+module.exports.getCard = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(CODE_OK).send(cards))
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка!' }));
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   console.log(req.user._id);
   const { name, link } = req.body;
   const owner = req.user._id;
@@ -20,68 +20,63 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(CODE_SUCCESS).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Данные переданы неверно' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Произошла ошибка!' });
+        throw new BadRequest('Данные переданы неверно');
       }
-    });
-};
-
-module.exports.deleteCard = (req, res) => {
-  const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
-      }
-      return res.status(CODE_OK).send(card);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Данные переданы неверно' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Произошла ошибка!' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.putLike = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
+  const { cardId } = req.params;
+  return Card.findById(cardId)
+    .orFail(() => {
+      throw new NotFound('Карточка не найдена');
+    })
+    .then((card) => {
+      if (!card.owner.equals(req.user._id)) {
+        return next(new Forbidden('Ошибка прав доступа'));
+      }
+      return card.remove().then(() => res.send({ message: 'Удалено' }));
+    })
+    .catch(next);
+};
+
+module.exports.putLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
-      }
-      return res.status(CODE_OK).send(card);
-    })
+  ).orFail(() => {
+    throw new NotFound('ID не найден');
+  })
+    .then((card) => res.status(CODE_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Данные переданы неверно' });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Произошла ошибка!' });
+        throw new BadRequest('Данные переданы неверно');
       }
-    });
+      if (err.message === 'NotFound') {
+        throw new NotFound('ID не найден');
+      }
+    })
+    .catch(next);
 };
 
-module.exports.deleteLike = (req, res) => {
+module.exports.deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
-      }
-      return res.status(CODE_OK).send(card);
-    })
+  ).orFail(() => {
+    throw new NotFound('ID не найден');
+  })
+    .then((card) => res.status(CODE_OK).send(card))
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Данные переданы неверно' });
+      if (err.name === 'CastError') {
+        throw new BadRequest('Данные переданы неверно');
       }
-      return res.status(SERVER_ERROR).send({ message: 'Произошла ошибка!' });
-    });
+      if (err.message === 'NotFound') {
+        throw new NotFound('ID не найден');
+      }
+    })
+    .catch(next);
 };

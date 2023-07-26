@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const CODE_OK = 200;
+const CODE_SUCCESS = 201;
 const BadRequest = require('../errors/BadRequest (400)');
 const Conflict = require('../errors/Conflict (409)');
 const NotFound = require('../errors/NotFound (404)');
@@ -23,7 +24,7 @@ module.exports.createUser = (req, res, next) => {
   }))
     .then((user) => {
       const { _id } = user;
-      return res.status(201).send({
+      return res.status(CODE_SUCCESS).send({
         email, name, about, avatar, _id,
       });
     })
@@ -104,7 +105,7 @@ module.exports.getLogUser = (req, res, next) => {
   User.findById(req.user._id).orFail(() => {
     throw new NotFound('Пользователь не найден');
   })
-    .then((user) => res.status(200).send({ user }))
+    .then((user) => res.status(CODE_OK).send({ user }))
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequest('Переданы некорректные данные');

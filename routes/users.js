@@ -16,7 +16,7 @@ const {
 
 router.get('/', getUser);
 router.get('/me', getLogUser);
-router.patch('/me', changeUserInfo, validationUpdateUser);
-router.get('/:userId', getUserId, validationUserId);
-router.patch('/me/avatar', changeAvatar, validationUpdateAvatar);
+router.patch('/me', validationUpdateUser, changeUserInfo);
+router.get('/:userId', validationUserId, getUserId);
+router.patch('/me/avatar', validationUpdateAvatar, changeAvatar);
 module.exports = router;

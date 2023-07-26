@@ -3,11 +3,13 @@ const Unauthorized = require('../errors/Unauthorized (401)');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  const extractBearerToken = 'Bearer ';
+
+  if (!authorization || !authorization.startsWith(extractBearerToken)) {
     return next(new Unauthorized('Неправильные почта или пароль'));
   }
 
-  const token = authorization.replace('Bearer ', '');
+  const token = authorization.replace(extractBearerToken, '');
   let payload;
 
   try {
