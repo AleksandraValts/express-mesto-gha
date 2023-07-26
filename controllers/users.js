@@ -11,16 +11,16 @@ const Unauthorized = require('../errors/Unauthorized (401)');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((users) => res.send(users))
+    .then((users) => res.send({ users }))
     .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    email, password, name, about, avatar,
   } = req.body;
   bcrypt.hash(password, 10).then((hash) => User.create({
-    name, about, avatar, email, password: hash,
+    email, password: hash, name, about, avatar,
   }))
     .then((user) => {
       const { _id } = user;
@@ -102,16 +102,17 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getLogUser = (req, res, next) => {
-  User.findById(req.user._id).orFail(() => {
-    throw new NotFound('Пользователь не найден');
-  })
-    .then((user) => res.status(CODE_OK).send({ user }))
+  const { userId } = req.user;
+  User.findById(userId)
+    .then((user) => {
+      if (user) return res.send({ user });
+      throw new NotFound('Пользователь не найден');
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные');
-      } else if (err.message === 'NotFound') {
-        throw new NotFound('Пользователь не найден');
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
