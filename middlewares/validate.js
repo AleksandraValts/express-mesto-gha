@@ -33,6 +33,13 @@ module.exports.validationCreateUser = celebrate({
   }),
 });
 
+module.exports.validationChangeUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    about: Joi.string().min(2).max(30).required(),
+  }),
+});
+
 module.exports.validationChangeAvatar = celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().custom(validationUrl),
