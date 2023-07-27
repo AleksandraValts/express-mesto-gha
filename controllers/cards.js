@@ -29,14 +29,14 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   return Card.findById(cardId)
-    .orFail(() => {
-      throw new NotFound('Карточка не найдена');
-    })
     .then((card) => {
+      if (!card) {
+        throw new NotFound('Карточка не найдена');
+      }
       if (!card.owner.equals(req.user._id)) {
         return next(new Forbidden('Ошибка прав доступа'));
       }
-      return card.remove().then(() => res.send({ message: 'Удалено' }));
+      return card.remove().then(() => res.send({ message: 'Карточка удалена' }));
     })
     .catch(next);
 };
