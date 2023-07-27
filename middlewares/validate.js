@@ -10,22 +10,15 @@ const validationUrl = (url) => {
   throw new BadRequest('Неверный формат ссылки');
 };
 
-const validationId = (id) => {
-  if (/^[a-z0-9]{24}/i.test(id)) {
-    return id;
-  }
-  throw new BadRequest('Неверный формат ID');
-};
-
 module.exports.validationUserId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required().custom(validationId),
+    userId: Joi.string().length(24).hex().required(),
   }),
 });
 
 module.exports.validationCardId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required().custom(validationId),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 });
 
