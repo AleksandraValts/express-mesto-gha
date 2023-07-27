@@ -11,7 +11,7 @@ const validationUrl = (url) => {
 };
 
 const validationID = (id) => {
-  if (/^[0-9a-fA-F]{24}$/.test(id)) {
+  if (/^[0-9a-z]{24}$/i.test(id)) {
     return id;
   }
   throw new BadRequest('Передан некорретный id.');
