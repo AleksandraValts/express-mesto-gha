@@ -10,9 +10,16 @@ const validationUrl = (url) => {
   throw new BadRequest('Некорректный адрес URL');
 };
 
+const validationID = (id) => {
+  if (/^[0-9a-fA-F]{24}$/.test(id)) {
+    return id;
+  }
+  throw new BadRequest('Передан некорретный id.');
+};
+
 module.exports.validationUserId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required(),
+    userId: Joi.string().required().custom(validationID),
   }),
 });
 
@@ -55,6 +62,6 @@ module.exports.validationCreateCard = celebrate({
 
 module.exports.validationCardById = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().required(),
+    cardId: Joi.string().required().custom(validationID),
   }),
 });
