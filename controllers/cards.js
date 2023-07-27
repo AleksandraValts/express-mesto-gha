@@ -42,7 +42,7 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((deletedCard) => {
       if (!deletedCard) {
-        throw new NotFound('Карточка уже была удалена');
+        throw new NotFound('Карточка не найдена');
       }
       res.send({ data: deletedCard });
     })
