@@ -47,9 +47,10 @@ module.exports.getUserId = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return BadRequest(res);
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
@@ -63,9 +64,10 @@ module.exports.changeUserInfo = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return BadRequest(res);
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
@@ -79,9 +81,10 @@ module.exports.changeAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return BadRequest(res);
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
@@ -111,8 +114,9 @@ module.exports.getLogUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return BadRequest(res);
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };

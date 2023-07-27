@@ -1,7 +1,6 @@
-const BadRequest = (res) => {
-  res
-    .status(400)
-    .send({ message: 'Данные переданы неверно' });
+module.exports = class BadRequest extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 400;
+  }
 };
-
-module.exports = BadRequest;
