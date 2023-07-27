@@ -42,41 +42,42 @@ module.exports.deleteCard = (req, res, next) => {
 };
 
 module.exports.putLike = (req, res, next) => {
+  const { cardId } = req.params;
+  const { userId } = req.user;
   Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
+    cardId,
+    { $addToSet: { likes: userId } },
     { new: true },
-  ).orFail(() => {
-    throw new NotFound('ID не найден');
+  ).then((card) => {
+    if (card) return res.send({ data: card });
+    throw new NotFound('Карточка не найдена');
   })
-    .then((card) => res.status(CODE_OK).send(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequest('Данные переданы неверно');
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      if (err.message === 'NotFound') {
-        throw new NotFound('ID не найден');
-      }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.deleteLike = (req, res, next) => {
+  const { cardId } = req.params;
+  const { userId } = req.user;
   Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
+    cardId,
+    { $pull: { likes: userId } },
     { new: true },
-  ).orFail(() => {
-    throw new NotFound('ID не найден');
-  })
-    .then((card) => res.status(CODE_OK).send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new BadRequest('Данные переданы неверно');
-      }
-      if (err.message === 'NotFound') {
-        throw new NotFound('ID не найден');
-      }
+  )
+    .then((card) => {
+      if (card) return res.send({ data: card });
+      throw new NotFound('Карточка не найдена');
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
+      }
+    });
 };
