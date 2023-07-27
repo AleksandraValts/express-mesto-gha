@@ -8,8 +8,8 @@ const handleAuthError = (res) => {
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
-  const bearer = 'Bearer ';
-  if (!authorization || !authorization.startsWith(bearer)) {
+  const extractBearerToken = 'Bearer ';
+  if (!authorization || !authorization.startsWith(extractBearerToken)) {
     return handleAuthError(res);
   }
   const token = authorization.replace('Bearer ', '');
