@@ -7,14 +7,14 @@ const validationUrl = (url) => {
   if (validate) {
     return url;
   }
-  throw new BadRequest('Некорректный адрес URL');
+  throw new BadRequest('Неверный формат ссылки');
 };
 
 const validationId = (id) => {
   if (/^[a-z0-9]{24}/i.test(id)) {
     return id;
   }
-  throw new BadRequest('Передан некорретный id.');
+  throw new BadRequest('Неверный формат ID');
 };
 
 module.exports.validationUserId = celebrate({
