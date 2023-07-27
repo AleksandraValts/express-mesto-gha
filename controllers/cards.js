@@ -13,17 +13,17 @@ module.exports.getCard = (req, res, next) => {
 };
 
 module.exports.createCard = (req, res, next) => {
-  console.log(req.user._id);
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((card) => res.status(CODE_SUCCESS).send(card))
+  const { userId } = req.user;
+  Card.create({ name, link, owner: userId })
+    .then((card) => res.status(CODE_SUCCESS).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Данные переданы неверно');
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
