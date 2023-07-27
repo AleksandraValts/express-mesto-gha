@@ -29,12 +29,12 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new Conflict('Пользователь уже существует'));
+        next(new Conflict('Пользователь уже зарегистрирован'));
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequest('Данные переданы неверно'));
+      } else {
+        next(err);
       }
-      if (err.name === 'ValidationError') {
-        return next(new BadRequest('Данные переданы неверно'));
-      }
-      return next(err);
     });
 };
 
@@ -47,10 +47,9 @@ module.exports.getUserId = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Данные переданы неверно'));
-      } else {
-        next(err);
+        return BadRequest(res);
       }
+      return next(err);
     });
 };
 
@@ -64,10 +63,9 @@ module.exports.changeUserInfo = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new BadRequest('Данные переданы неверно'));
-      } else {
-        next(err);
+        return BadRequest(res);
       }
+      return next(err);
     });
 };
 
@@ -81,10 +79,9 @@ module.exports.changeAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new BadRequest('Данные переданы неверно'));
-      } else {
-        next(err);
+        return BadRequest(res);
       }
+      return next(err);
     });
 };
 
@@ -114,9 +111,8 @@ module.exports.getLogUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Данные переданы неверно'));
-      } else {
-        next(err);
+        return BadRequest(res);
       }
+      return next(err);
     });
 };
